@@ -1,0 +1,14 @@
+{
+    "users": [
+        {
+            "id": "1",
+            "email": "test@test.com",
+            "password": "test123",
+            "name": "Test User",
+            "company": "Jobaar",
+            "role": "Recruiter",
+            "createdAt": "2024-03-21T00:00:00.000Z",
+            "lastLogin": null
+        }
+    ]
+} 

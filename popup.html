@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobaar Referral Extension - Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="logo">
+                <img src="icon48.png" alt="Jobaar Logo">
+            </div>
+            <h1>Welcome to Jobaar</h1>
+            <p>Please login to continue</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <div id="emailError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <div id="passwordError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" id="remember" name="remember">
+                        Remember me
+                    </label>
+                </div>
+                
+                <div id="loginError" class="error-message"></div>
+                <div id="loginSuccess" class="success-message"></div>
+                
+                <div class="button-group">
+                    <button type="submit" id="loginButton">
+                        <span class="button-text">Login</span>
+                        <div id="loadingIndicator" class="loading-indicator"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

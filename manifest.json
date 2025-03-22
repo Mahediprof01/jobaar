@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Jobaar Referral Extension",
+  "version": "1.0.0",
+  "description": "Extract LinkedIn profiles and manage referrals",
+  "permissions": [
+      "storage",
+      "activeTab",
+      "scripting",
+      "tabs"
+  ],
+  "host_permissions": [
+      "https://*.linkedin.com/*"
+  ],
+  "background": {
+      "service_worker": "background.js",
+      "type": "module"
+  },
+  "content_scripts": [
+      {
+          "matches": ["https://*.linkedin.com/*"],
+          "js": ["content-script.js"],
+          "run_at": "document_idle"
+      }
+  ],
+  "web_accessible_resources": [
+      {
+          "resources": ["content-script.js"],
+          "matches": ["https://*.linkedin.com/*"]
+      }
+  ],
+  "action": {
+      "default_popup": "popup.html",
+      "default_icon": {
+          "16": "icons/icon16.png",
+          "48": "icons/icon48.png",
+          "128": "icons/icon128.png"
+      }
+  },
+  "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+  }
+}

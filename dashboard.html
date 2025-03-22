@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jobaar Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            padding: 20px;
+            width: 400px;
+        }
+        .welcome-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .referral-list {
+            margin-top: 20px;
+        }
+        .referral-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: white;
+        }
+        .status-pending { background-color: #ffa726; }
+        .status-accepted { background-color: #66bb6a; }
+        .status-interview { background-color: #42a5f5; }
+        .status-hired { background-color: #7e57c2; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="welcome-header">
+            <img src="icons/icon48.png" alt="Jobaar Logo" class="logo">
+            <div>
+                <h2 id="welcome-name">Welcome</h2>
+                <p id="user-role"></p>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-number" id="referral-count">0</div>
+                <div class="stat-label">Total Referrals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="open-positions">0</div>
+                <div class="stat-label">Open Positions</div>
+            </div>
+        </div>
+
+        <h3>Recent Referrals</h3>
+        <div class="referral-list" id="referral-list">
+            <!-- Referrals will be populated here -->
+        </div>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+</html> 
