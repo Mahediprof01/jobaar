@@ -71,13 +71,32 @@ if (window.linkedInParserInitialized) {
                 }
 
                 // Get location (try multiple selectors)
-                const locationElement = document.querySelector('.pv-text-details__default-text') || 
-                                      document.querySelector('.text-body-small[href*="geo"]') || 
-                                      document.querySelector('.pb2 .text-body-small:not([class*="distance"]):not([class*="degree"])');
+                const locationElement = document.querySelector('.pALhwWfFWHgQfuluDdzcOgzTkuEBpjlWoyQ .text-body-small:not([class*="distance"]):not([class*="degree"])') || 
+                                      document.querySelector('.text-body-small:not([class*="distance"]):not([class*="degree"])') ||
+                                      document.querySelector('.pv-text-details__default-text');
                 
                 if (locationElement) {
-                    this.profileData.location = locationElement.textContent.trim();
-                    console.log('Location found:', this.profileData.location);
+                    const locationText = locationElement.textContent.trim();
+                    // Filter out connection degree text
+                    if (!locationText.includes('degree connection')) {
+                        this.profileData.location = locationText;
+                        console.log('Location found:', this.profileData.location);
+                    }
+                }
+
+                // Try alternative location selector if first attempt failed
+                if (!this.profileData.location) {
+                    const locationContainer = document.querySelector('.pALhwWfFWHgQfuluDdzcOgzTkuEBpjlWoyQ');
+                    if (locationContainer) {
+                        const spans = locationContainer.querySelectorAll('span');
+                        spans.forEach(span => {
+                            const text = span.textContent.trim();
+                            if (text && !text.includes('degree connection') && !text.includes('Contact info')) {
+                                this.profileData.location = text;
+                                console.log('Location found from alternative method:', this.profileData.location);
+                            }
+                        });
+                    }
                 }
 
                 // Set LinkedIn URL (clean version without query parameters)
@@ -85,8 +104,10 @@ if (window.linkedInParserInitialized) {
                 console.log('LinkedIn URL:', this.profileData.linkedinProfile);
 
                 // Get contact info by clicking contact info button and waiting for modal
-                const contactInfoButton = document.querySelector('.pv-top-card-v2__contact-info') ||
+                const contactInfoButton = document.querySelector('a[href*="overlay/contact-info"]') ||
+                                       document.querySelector('.pv-top-card-v2__contact-info') ||
                                        document.querySelector('[data-control-name="contact_see_more"]');
+                
                 if (contactInfoButton) {
                     contactInfoButton.click();
                     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -95,36 +116,26 @@ if (window.linkedInParserInitialized) {
                     const contactModal = document.querySelector('.artdeco-modal');
                     if (contactModal) {
                         // Get email addresses
-                        const emailSection = contactModal.querySelector('.ci-email');
-                        if (emailSection) {
-                            const emailElements = emailSection.querySelectorAll('a');
-                            emailElements.forEach(element => {
-                                const emailText = element.textContent.trim();
-                                if (emailText.includes('@')) {
-                                    const emailType = element.closest('.pv-contact-info__ci-container')?.textContent.toLowerCase() || '';
-                                    if (emailType.includes('work') || emailType.includes('business')) {
-                                        this.profileData.businessEmail = emailText;
-                                    } else {
-                                        this.profileData.personalEmail = emailText;
-                                    }
-                                }
-                            });
-                        }
-
-                        // Get phone number
-                        const phoneSection = contactModal.querySelector('.ci-phone');
-                        if (phoneSection) {
-                            const phoneElement = phoneSection.querySelector('span.t-black--light') ||
-                                               phoneSection.querySelector('a') ||
-                                               phoneSection.querySelector('.pv-contact-info__ci-container');
-                            if (phoneElement) {
-                                const phoneText = phoneElement.textContent.trim();
-                                // Only set if it looks like a phone number
-                                if (phoneText.match(/[\d\s\+\-\(\)]/)) {
-                                    this.profileData.mobileNumber = phoneText.replace(/\s+/g, ' ').trim();
+                        const emailElements = contactModal.querySelectorAll('section.ci-email a');
+                        emailElements.forEach(email => {
+                            const emailText = email.textContent.trim();
+                            if (emailText.includes('@')) {
+                                if (!this.profileData.personalEmail) {
+                                    this.profileData.personalEmail = emailText;
+                                } else if (!this.profileData.businessEmail) {
+                                    this.profileData.businessEmail = emailText;
                                 }
                             }
-                        }
+                        });
+
+                        // Get phone numbers
+                        const phoneElements = contactModal.querySelectorAll('section.ci-phone span');
+                        phoneElements.forEach(phone => {
+                            const phoneText = phone.textContent.trim();
+                            if (phoneText && !this.profileData.mobileNumber) {
+                                this.profileData.mobileNumber = phoneText;
+                            }
+                        });
 
                         // Close the modal
                         const closeButton = contactModal.querySelector('.artdeco-modal__dismiss');
@@ -134,17 +145,11 @@ if (window.linkedInParserInitialized) {
                     }
                 }
 
-                console.log('Final profile data:', this.profileData);
-                return {
-                    success: true,
-                    data: this.profileData
-                };
+                console.log('Profile data parsed:', this.profileData);
+                return { success: true, data: this.profileData };
             } catch (error) {
                 console.error('Error parsing profile:', error);
-                return {
-                    success: false,
-                    error: error.message
-                };
+                return { success: false, error: error.message };
             }
         }
     }
@@ -153,21 +158,12 @@ if (window.linkedInParserInitialized) {
     console.log('Content script loaded');
     const parser = new LinkedInProfileParser();
 
-    // Listen for messages from the extension
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('Message received:', request);
         
-        if (request.action === 'getProfileData') {
-            parser.parseProfile()
-                .then(response => {
-                    console.log('Sending response:', response);
-                    sendResponse(response);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    sendResponse({ success: false, error: error.message });
-                });
-            return true; // Required to use sendResponse asynchronously
+        if (request.action === "getProfileData") {
+            parser.parseProfile().then(sendResponse);
+            return true; // Will respond asynchronously
         }
     });
 }
